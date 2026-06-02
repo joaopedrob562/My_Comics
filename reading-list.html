@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Minha Reading List de HQs</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17; --panel: #1a1828; --border: #2e2b45;
+    --yellow: #f9c74f; --red: #e63946; --blue: #4cc9f0;
+    --green: #80b918; --purple: #9b5de5; --text: #fffffe; --muted: #a7a4c0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; padding-bottom: 80px;
+    background-image: radial-gradient(ellipse at 10% 20%, rgba(155,93,229,0.07) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(230,57,70,0.07) 0%, transparent 50%); }
+
+  header { background: var(--panel); border-bottom: 3px solid var(--yellow); padding: 24px; text-align: center; position: relative; overflow: hidden; }
+  header::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(249,199,79,0.03) 10px,rgba(249,199,79,0.03) 20px); }
+  header h1 { font-family:'Bangers',cursive; font-size:2.8rem; letter-spacing:3px; color:var(--yellow); text-shadow:3px 3px 0 var(--red),6px 6px 0 rgba(0,0,0,0.5); position:relative; }
+  header p { color:var(--muted); margin-top:6px; font-size:0.9rem; position:relative; }
+
+  .stats-bar { display:flex; justify-content:center; gap:28px; padding:14px 24px; background:rgba(249,199,79,0.05); border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat-num { font-family:'Bangers',cursive; font-size:1.7rem; color:var(--yellow); line-height:1; }
+  .stat-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .stat-sub { font-size:0.7rem; color:var(--muted); margin-top:1px; }
+
+  .progress-wrap { padding:14px 20px 0; max-width:960px; margin:0 auto; }
+  .progress-label { display:flex; justify-content:space-between; font-size:0.8rem; color:var(--muted); margin-bottom:5px; }
+  .progress-bar { height:7px; background:var(--border); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--yellow),var(--red)); border-radius:10px; transition:width 0.5s; }
+
+  /* VIEW SWITCHER */
+  .view-switcher { display:flex; justify-content:center; gap:6px; padding:16px 16px 0; max-width:960px; margin:0 auto; }
+  .view-btn { background:var(--panel); border:2px solid var(--border); color:var(--muted); font-family:'Nunito',sans-serif; font-weight:700; font-size:0.8rem; padding:7px 18px; border-radius:20px; cursor:pointer; transition:all 0.2s; }
+  .view-btn.active { border-color:var(--yellow); color:var(--yellow); background:rgba(249,199,79,0.08); }
+
+  /* TABS */
+  .tabs-wrap { padding:10px 16px 0; max-width:960px; margin:0 auto; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .tab { background:var(--panel); border:2px solid var(--border); color:var(--muted); font-family:'Nunito',sans-serif; font-weight:700; font-size:0.75rem; padding:5px 14px; border-radius:8px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:1px; }
+  .tab:hover,.tab.active { border-color:var(--tab-c,var(--yellow)); color:var(--tab-c,var(--yellow)); background:rgba(255,255,255,0.04); }
+
+  /* HERO WRAP */
+  .hero-wrap { max-width:960px; margin:20px auto 0; padding:0 16px; }
+  .hero-block { margin-bottom:32px; }
+  .hero-title { font-family:'Bangers',cursive; font-size:1.6rem; letter-spacing:2px; margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .hero-prog { margin-left:auto; font-size:0.72rem; color:var(--muted); background:var(--panel); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-family:'Nunito',sans-serif; white-space:nowrap; }
+
+  /* ORDER VIEW — numbered steps */
+  .order-step { background:var(--panel); border:2px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; display:flex; align-items:stretch; transition:border-color 0.2s; }
+  .order-step.done { opacity:0.55; border-color:var(--green); }
+  .order-step-num { font-family:'Bangers',cursive; font-size:1.6rem; color:var(--yellow); min-width:52px; display:flex; align-items:center; justify-content:center; background:rgba(249,199,79,0.06); border-right:2px solid var(--border); padding:0 10px; }
+  .order-step.done .order-step-num { color:var(--green); background:rgba(128,185,24,0.08); border-color:var(--green); }
+  .order-step-body { flex:1; padding:12px 14px; cursor:pointer; }
+  .order-step-body:hover { background:rgba(255,255,255,0.02); }
+  .order-step-hero { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .order-step-name { font-weight:700; font-size:0.95rem; line-height:1.3; }
+  .order-step-author { font-size:0.75rem; color:var(--muted); font-style:italic; margin-top:2px; }
+  .order-step-tip { font-size:0.78rem; color:#c8c5d8; margin-top:6px; line-height:1.4; border-top:1px solid var(--border); padding-top:6px; }
+  .order-step-right { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; padding:10px 14px; gap:6px; }
+
+  /* MIXED VIEW */
+  .mixed-step { background:var(--panel); border-left:4px solid var(--step-c,var(--yellow)); border-radius:0 12px 12px 0; border-top:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:8px; overflow:hidden; }
+  .mixed-step.done { opacity:0.55; }
+  .mixed-header { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; }
+  .mixed-header:hover { background:rgba(255,255,255,0.02); }
+  .mixed-num { font-family:'Bangers',cursive; font-size:1.3rem; color:var(--step-c,var(--yellow)); min-width:30px; }
+  .mixed-hero-tag { font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:8px; text-transform:uppercase; letter-spacing:0.4px; background:rgba(255,255,255,0.06); color:var(--step-c,var(--yellow)); border:1px solid var(--step-c,var(--yellow)); white-space:nowrap; }
+  .mixed-name { font-weight:700; font-size:0.9rem; flex:1; }
+  .mixed-check { width:26px; height:26px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.8rem; cursor:pointer; transition:all 0.18s; color:var(--muted); flex-shrink:0; }
+  .mixed-step.done .mixed-check { background:var(--green); border-color:var(--green); color:#fff; }
+
+  /* ARC */
+  .arc { background:var(--panel); border:2px solid var(--border); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color 0.3s; }
+  .arc.arc-done { border-color:var(--green); opacity:0.65; }
+  .arc-header { display:flex; align-items:center; gap:10px; padding:12px 16px; cursor:pointer; user-select:none; }
+  .arc-header:hover { background:rgba(255,255,255,0.03); }
+  .arc-dot { width:10px; height:10px; border-radius:50%; background:var(--arc-c,var(--yellow)); flex-shrink:0; }
+  .arc-name { font-weight:700; font-size:0.95rem; flex:1; }
+  .arc-meta { font-size:0.75rem; color:var(--muted); }
+  .arc-prog-text { font-size:0.75rem; color:var(--muted); white-space:nowrap; }
+  .arc-chevron { font-size:0.8rem; color:var(--muted); transition:transform 0.2s; }
+  .arc.open .arc-chevron { transform:rotate(90deg); }
+  .arc-mini-bar { height:3px; background:var(--border); }
+  .arc-mini-fill { height:100%; background:var(--arc-c,var(--yellow)); transition:width 0.4s; }
+  .vols-grid { display:none; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; padding:12px 16px 14px; border-top:1px solid var(--border); }
+  .arc.open .vols-grid { display:grid; }
+  .vol-item { background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.18s; }
+  .vol-item:hover { border-color:var(--arc-c,var(--yellow)); }
+  .vol-item.done { background:rgba(128,185,24,0.08); border-color:var(--green); }
+  .vol-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.7rem; flex-shrink:0; transition:all 0.18s; color:var(--muted); }
+  .vol-item.done .vol-check { background:var(--green); border-color:var(--green); color:#fff; }
+  .vol-item:hover .vol-check { border-color:var(--arc-c,var(--yellow)); }
+  .vol-label { font-size:0.78rem; font-weight:600; line-height:1.2; }
+
+  .badge { font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:8px; text-transform:uppercase; letter-spacing:0.4px; }
+  .badge-must { background:rgba(230,57,70,0.18); color:var(--red); border:1px solid var(--red); }
+  .badge-great { background:rgba(76,201,240,0.13); color:var(--blue); border:1px solid var(--blue); }
+  .badge-classic { background:rgba(249,199,79,0.13); color:var(--yellow); border:1px solid var(--yellow); }
+  .badge-legend { background:rgba(155,93,229,0.15); color:var(--purple); border:1px solid var(--purple); }
+
+  .salvat-note { font-size:0.72rem; color:var(--yellow); background:rgba(249,199,79,0.08); border:1px solid rgba(249,199,79,0.25); border-radius:6px; padding:6px 10px; margin:0 16px 10px; line-height:1.4; }
+
+  @media(max-width:500px){ header h1{font-size:2rem;} .vols-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));} }
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 A MINHA READING LIST</h1>
+  <p>Volume a volume — marca o que leste</p>
+</header>
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="s-total-arcs">0</div><div class="stat-label">Livros</div><div class="stat-sub" id="s-total-vols">0 volumes</div></div>
+  <div class="stat"><div class="stat-num" id="s-done-arcs" style="color:var(--green)">0</div><div class="stat-label">Livros Lidos</div><div class="stat-sub" id="s-done-vols">0 volumes</div></div>
+  <div class="stat"><div class="stat-num" id="s-left-arcs" style="color:var(--blue)">0</div><div class="stat-label">Por Ler</div><div class="stat-sub" id="s-left-vols">0 volumes</div></div>
+  <div class="stat"><div class="stat-num" id="s-pct2" style="color:var(--yellow)">0%</div><div class="stat-label">Concluído</div><div class="stat-sub">por volumes</div></div>
+</div>
+<div class="progress-wrap">
+  <div class="progress-label"><span>Progresso geral</span><span id="s-pct">0%</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="s-bar" style="width:0%"></div></div>
+</div>
+
+<!-- VIEW SWITCHER -->
+<div class="view-switcher">
+  <button class="view-btn active" onclick="setView('library',this)">📚 Biblioteca</button>
+  <button class="view-btn" onclick="setView('order',this)">🎯 Ordem por Personagem</button>
+  <button class="view-btn" onclick="setView('mixed',this)">🔀 Ordem Misturada</button>
+</div>
+
+<div class="tabs-wrap" id="tabs-wrap"><div class="tabs" id="tabs"></div></div>
+<div class="hero-wrap" id="app"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const GROUPS = [
+  { id:'marvel-solo', label:'🔴 Solo Marvel', color:'#e63946' },
+  { id:'dc-solo',     label:'🔵 Solo DC',     color:'#4cc9f0' },
+  { id:'marvel-team', label:'🔴 Grupos Marvel',color:'#e63946' },
+  { id:'dc-team',     label:'🔵 Grupos DC',    color:'#4cc9f0' },
+  { id:'absolute',    label:'🌑 Absolute DC',  color:'#c77dff' },
+  { id:'bonus',       label:'⭐ Bónus',        color:'#f9c74f' },
+  { id:'indie',       label:'📖 Independentes',color:'#9b5de5' },
+];
+
+function vols(prefix, n, readUpTo=0) {
+  return Array.from({length:n},(_,i)=>({ label:`${prefix} ${i+1}`, read: i<readUpTo }));
+}
+
+const HEROES = [
+  { id:'spiderman', group:'marvel-solo', name:'🕷️ Homem-Aranha', color:'#e63946', arcs:[
+    { name:'Amazing Spider-Man — Origem', author:'Stan Lee / Steve Ditko', badge:'classic', badgeLabel:'Clássico', salvatNote:'* Coleção Salvat: tomo 40 (Origen)',
+      volumes:[ {label:'ASM #1-10 (1963)', read:true},{label:'ASM #11-20', read:false},{label:'ASM #21-38', read:false} ] },
+    { name:'Coleção Salvat (40 tomos)', author:'Vários — Salvat/Panini 2019', badge:'classic', badgeLabel:'Clássico', salvatNote:'* Atenção: a coleção Salvat não segue ordem cronológica. Os tomos contêm: #1 Entre los Muertos · #2 Percepciones · #3 Spider-Island · #4 La Saga del Clon · #5 El Último Asalto · #6 Nadie Puede Detener a Juggernaut · #7 Un Día Más · #8 La Saga del Traje Negro · #9 Días de Gloria · #10 El Mal que Hacen los Hombres · #11 Salvaje · #13 Spider-Man Noir · #14 El Desafío del Duende · #15 Un Nuevo Día · #16 El Origen de Veneno · #17 Otro Bonito Follón · #18 La Trilogía de las Drogas · #19 A lo Grande · #20 La Marca de la Tarántula · #21-22 El Otro (1ª e 2ª Parte) · #24 La Araña y la Llama · #25 Feliz Cumpleaños · #26 La Última Cacería de Kraven · #27 Spiderman Vengador · #28 El Regreso de los Seis Siniestros · #29 La Muerte de Gwen Stacy · #30 Tormento · #31 La Gata y el Doctor · #32 El Viaje en el Tiempo · #33 Universo Spiderman · #34 El Héroe y el Holocausto · #35 Vuelta a Casa · #36 El Regreso del Ladrón · #37 Una Muerte en la Familia · #38 Amor y Muerte · #39 Nuevas Formas de Morir · #40 Hasta que las Estrellas se Congelen',
+      volumes:[ {label:'Tomo 1 - Entre los Muertos', read:true},{label:'Tomo 2 - Percepciones', read:false},{label:'Tomo 3 - Spider-Island', read:false},{label:'Tomo 4 - La Saga del Clon', read:false},{label:'Tomo 5 - El Último Asalto', read:false},{label:'Tomo 6 - Nadie Puede Detener al Juggernaut', read:false},{label:'Tomo 7 - Un Día Más', read:false},{label:'Tomo 8 - La Saga del Traje Negro', read:false},{label:'Tomo 9 - Días de Gloria', read:false},{label:'Tomo 10 - El Mal que Hacen los Hombres', read:false},{label:'Tomo 11 - Salvaje', read:false},{label:'Tomo 12 - La Boda', read:false},{label:'Tomo 13 - Spider-Man Noir', read:false},{label:'Tomo 14 - El Desafío del Duende', read:false},{label:'Tomo 15 - Un Nuevo Día', read:false},{label:'Tomo 16 - El Origen de Veneno', read:false},{label:'Tomo 17 - Otro Bonito Follón', read:false},{label:'Tomo 18 - La Trilogía de las Drogas', read:false},{label:'Tomo 19 - A lo Grande', read:false},{label:'Tomo 20 - La Marca de la Tarántula', read:false},{label:'Tomo 21 - El Otro 1ª Parte', read:false},{label:'Tomo 22 - El Otro 2ª Parte', read:false},{label:'Tomo 23 - La Muerte de Jean DeWolf', read:false},{label:'Tomo 24 - La Araña y la Llama', read:false},{label:'Tomo 25 - Feliz Cumpleaños', read:false},{label:'Tomo 26 - La Última Cacería de Kraven', read:true},{label:'Tomo 27 - Spiderman Vengador', read:false},{label:'Tomo 28 - El Regreso de los Seis Siniestros', read:false},{label:'Tomo 29 - La Muerte de Gwen Stacy', read:false},{label:'Tomo 30 - Tormento', read:false},{label:'Tomo 31 - La Gata y el Doctor', read:false},{label:'Tomo 32 - El Viaje en el Tiempo', read:false},{label:'Tomo 33 - Universo Spiderman', read:false},{label:'Tomo 34 - El Héroe y el Holocausto', read:false},{label:'Tomo 35 - Vuelta a Casa', read:false},{label:'Tomo 36 - El Regreso del Ladrón', read:false},{label:'Tomo 37 - Una Muerte en la Familia', read:false},{label:'Tomo 38 - Amor y Muerte', read:false},{label:'Tomo 39 - Nuevas Formas de Morir', read:false},{label:'Tomo 40 - Hasta que las Estrellas se Congelen', read:false} ] },
+    { name:'Spider-Man: Blue', author:'Jeph Loeb + Tim Sale', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',6) ] },
+    { name:'Ultimate Spider-Man', author:'Brian Michael Bendis', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',7) ] },
+  ]},
+
+  { id:'daredevil', group:'marvel-solo', name:'😈 Demolidor', color:'#f9c74f', arcs:[
+    { name:'Homem Sem Medo (Zdarsky)', author:'Chip Zdarsky', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ {label:'Vol 1',read:true},{label:'Vol 2',read:true},{label:'Vol 3',read:true},{label:'Vol 4',read:true},{label:'Vol 5',read:true},{label:'Vol 6',read:true} ] },
+    { name:'Demolidor (2019) — Continuação', author:'Chip Zdarsky', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...Array.from({length:36},(_,i)=>({label:`Issue #${i+1}`, read:false})) ] },
+    { name:'Reinado do Demônio', author:'Chip Zdarsky', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Vol',6) ] },
+    { name:'Guardian Devil', author:'Kevin Smith', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',8) ] },
+    { name:'Demolidor Amarelo', author:'Jeph Loeb + Tim Sale', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',6) ] },
+    { name:'Born Again', author:'Frank Miller', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Parte',7) ] },
+    { name:'Demolidor por Mark Waid', author:'Mark Waid', badge:'classic', badgeLabel:'Clássico',
+      volumes:[ ...vols('Vol',9) ] },
+  ]},
+
+  { id:'marvels', group:'marvel-solo', name:'📸 Marvels', color:'#f4a261', arcs:[
+    { name:'Marvels', author:'Kurt Busiek + Alex Ross', badge:'legend', badgeLabel:'Lendário',
+      volumes:[ {label:'Issue #0',read:true},{label:'Issue #1',read:true},{label:'Issue #2',read:true},{label:'Issue #3',read:true},{label:'Issue #4',read:true} ] },
+  ]},
+
+  { id:'punisher', group:'marvel-solo', name:'💀 Justiceiro', color:'#a7a4c0', arcs:[
+    { name:'Welcome Back, Frank', author:'Garth Ennis', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',12) ] },
+    { name:'Demolidor vs Justiceiro', author:'David Lapham', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',6) ] },
+    { name:'Punisher MAX', author:'Garth Ennis', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',6) ] },
+  ]},
+
+  { id:'jessica', group:'marvel-solo', name:'💜 Jessica Jones', color:'#9b5de5', arcs:[
+    { name:'Alias', author:'Brian Michael Bendis', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Vol',4) ] },
+    { name:'The Pulse', author:'Brian Michael Bendis', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',3) ] },
+  ]},
+
+  { id:'cap', group:'marvel-solo', name:'🛡️ Capitão América', color:'#4cc9f0', arcs:[
+    { name:'Cap América: The Winter Soldier', author:'Ed Brubaker', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ ...vols('Issue',14) ] },
+    { name:'Cap América: Civil War', author:'Ed Brubaker', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',7) ] },
+    { name:'Cap América: The Death of Captain America', author:'Ed Brubaker', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',14) ] },
+  ]},
+
+  { id:'ironman', group:'marvel-solo', name:'🦾 Homem de Ferro', color:'#e63946', arcs:[
+    { name:'Iron Man: Extremis', author:'Warren Ellis', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',6) ] },
+    { name:'Invincible Iron Man', author:'Matt Fraction', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',9) ] },
+  ]},
+
+  { id:'thor', group:'marvel-solo', name:'⚡ Thor', color:'#f4d35e', arcs:[
+    { name:'Thor: O Deus do Trovão', author:'Jason Aaron', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Vol',4) ] },
+    { name:'Thor: A Deusa do Trovão', author:'Jason Aaron', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Vol',4) ] },
+    { name:'Thor: Guerra dos Reinos', author:'Jason Aaron', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',2) ] },
+  ]},
+
+  { id:'batman', group:'dc-solo', name:'🦇 Batman', color:'#80b918', arcs:[
+    { name:'Batman: Year One', author:'Frank Miller', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ {label:'Batman #404',read:false},{label:'Batman #405',read:false},{label:'Batman #406',read:false},{label:'Batman #407',read:false} ] },
+    { name:'Batman: The Long Halloween', author:'Jeph Loeb', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',13) ] },
+    { name:'Batman: The Killing Joke', author:'Alan Moore', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ {label:'One-Shot',read:false} ] },
+  ]},
+
+  { id:'superman', group:'dc-solo', name:'🦸 Superman', color:'#4cc9f0', arcs:[
+    { name:'All-Star Superman', author:'Grant Morrison', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',12) ] },
+    { name:'Superman: Year One', author:'Frank Miller', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',3) ] },
+    { name:"Whatever Happened to the Man of Tomorrow?", author:'Alan Moore', badge:'classic', badgeLabel:'Clássico',
+      volumes:[ {label:'Superman #423',read:false},{label:'Action #583',read:false} ] },
+  ]},
+
+  { id:'flash', group:'dc-solo', name:'⚡ Flash', color:'#f4d35e', arcs:[
+    { name:'Flash: Born to Run', author:'Mark Waid', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ ...vols('Issue',5) ] },
+    { name:'Flash: The Return of Barry Allen', author:'Mark Waid', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',5) ] },
+    { name:'Flash: Rebirth', author:'Geoff Johns', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',6) ] },
+  ]},
+
+  { id:'greenarrow', group:'dc-solo', name:'🏹 Arqueiro Verde', color:'#80b918', arcs:[
+    { name:'Green Arrow: Year One', author:'Andy Diggle', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ ...vols('Issue',6) ] },
+    { name:'Green Arrow: Quiver', author:'Kevin Smith', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',10) ] },
+  ]},
+
+  { id:'xmen', group:'marvel-team', name:'🧬 X-Men', color:'#f4a261', arcs:[
+    { name:'X-Men: God Loves, Man Kills', author:'Chris Claremont', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ {label:'One-Shot',read:false} ] },
+    { name:'Dias de um Futuro Esquecido', author:'Chris Claremont', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ {label:'UXM #141',read:false},{label:'UXM #142',read:false} ] },
+    { name:'New X-Men', author:'Grant Morrison', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',7) ] },
+    { name:'Astonishing X-Men', author:'Joss Whedon', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Vol',4) ] },
+  ]},
+
+  { id:'avengers', group:'marvel-team', name:'⚡ Vingadores', color:'#e63946', arcs:[
+    { name:'The Ultimates', author:'Mark Millar + Bryan Hitch', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ {label:'Vol 1',read:false},{label:'Vol 2',read:false} ] },
+    { name:'Avengers: Ultron Unlimited', author:'Kurt Busiek', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Issue',5) ] },
+    { name:'New Avengers', author:'Brian Michael Bendis', badge:'great', badgeLabel:'Excelente',
+      volumes:[ ...vols('Vol',6) ] },
+  ]},
+
+  { id:'jla', group:'dc-team', name:'🌍 Liga da Justiça', color:'#4cc9f0', arcs:[
+    { name:'JLA: New World Order', author:'Grant Morrison', badge:'must', badgeLabel:'Começa Aqui',
+      volumes:[ ...vols('Issue',4) ] },
+    { name:'JLA: Tower of Babel', author:'Mark Waid', badge:'must', badgeLabel:'Obrigatório',
+      volumes:[ ...vols('Issue',4) ] },
+    { name:'Kingdom Come', author:'Mark Waid + Alex Ross', badge:'legend', badgeLabel:'Lendário',
+      volumes:[ ...vols('Issue',4) ] },
+  ]},
+
+  { id:'abs-ww',       group:'absolute', name:'🦸‍♀️ Absolute Wonder Woman', color:'#e63946', arcs:[
+    { name:'Absolute Wonder Woman Vol. 1 — The Last Amazon', author:'Kelly Thompson', badge:'must', badgeLabel:'Melhor da Linha', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Wonder Woman Vol. 2 — As My Mothers Made Me', author:'Kelly Thompson', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'abs-batman',   group:'absolute', name:'🦇 Absolute Batman', color:'#c77dff', arcs:[
+    { name:'Absolute Batman Vol. 1 — The Zoo', author:'Scott Snyder', badge:'must', badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Batman Vol. 2 — Abomination', author:'Scott Snyder', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'abs-mm',       group:'absolute', name:'👽 Absolute Martian Manhunter', color:'#80b918', arcs:[
+    { name:'Absolute Martian Manhunter Vol. 1 — Martian Vision', author:'Deniz Camp', badge:'legend', badgeLabel:'Surpresa do Ano', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Martian Manhunter Vol. 2 — The Agency', author:'Deniz Camp', badge:'legend', badgeLabel:'Lendário', volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'abs-superman', group:'absolute', name:'🦸 Absolute Superman', color:'#4cc9f0', arcs:[
+    { name:'Absolute Superman Vol. 1 — Last Dust of Krypton', author:'Jason Aaron', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Superman Vol. 2 — Son of the Demon', author:'Jason Aaron', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'abs-flash',    group:'absolute', name:'⚡ Absolute Flash', color:'#f4d35e', arcs:[
+    { name:'Absolute Flash Vol. 1 — Of Two Worlds', author:'Jeff Lemire', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Flash Vol. 2 — Still Point', author:'Jeff Lemire', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'abs-gl',       group:'absolute', name:'💚 Absolute Green Lantern', color:'#80b918', arcs:[
+    { name:'Absolute Green Lantern Vol. 1 — Without Fear', author:'Tom King', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Issue',6) ] },
+    { name:'Absolute Green Lantern Vol. 2 — Sojourner', author:'Tom King', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Issue',6) ] },
+  ]},
+
+  { id:'watchmen',   group:'bonus', name:'🔵 Watchmen',  color:'#9b5de5', arcs:[
+    { name:'Watchmen', author:'Alan Moore', badge:'legend', badgeLabel:'Lendário', volumes:[ ...vols('Issue',12) ] },
+  ]},
+  { id:'invincible', group:'bonus', name:'🟢 Invincible', color:'#80b918', arcs:[
+    { name:'Invincible', author:'Robert Kirkman', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Vol',25) ] },
+  ]},
+
+  { id:'sandman',   group:'indie', name:'🌙 Sandman', color:'#9b5de5', arcs:[
+    { name:'Sandman Vol. 1 — Prelúdios e Noturnos', author:'Neil Gaiman', badge:'must', badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',8) ] },
+    { name:'Sandman Vol. 2 — A Casa de Bonecas',    author:'Neil Gaiman', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Sandman Vol. 3 — País dos Sonhos',      author:'Neil Gaiman', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Sandman Vol. 4 — Estação das Brumas',   author:'Neil Gaiman', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Sandman Vol. 5 — Um Jogo de Ti',        author:'Neil Gaiman', badge:'great', badgeLabel:'Excelente',  volumes:[ ...vols('Issue',5) ] },
+    { name:'Sandman Vol. 6 — Fábulas e Reflexos',   author:'Neil Gaiman', badge:'great', badgeLabel:'Excelente',  volumes:[ ...vols('Issue',10) ] },
+    { name:'Sandman Vol. 7 — Vidas Breves',         author:'Neil Gaiman', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',7) ] },
+    { name:'Sandman Vol. 8 — Fim dos Mundos',       author:'Neil Gaiman', badge:'great', badgeLabel:'Excelente',  volumes:[ ...vols('Issue',6) ] },
+    { name:'Sandman Vol. 9 — As Benevolentes',      author:'Neil Gaiman', badge:'must', badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',9) ] },
+    { name:'Sandman Vol. 10 — O Velório',           author:'Neil Gaiman', badge:'legend', badgeLabel:'Lendário',  volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'lockekey', group:'indie', name:'🗝️ Locke & Key', color:'#e63946', arcs:[
+    { name:'Locke & Key Vol. 1 — Bem-vindo a Lovecraft', author:'Joe Hill', badge:'must',   badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',6) ] },
+    { name:'Locke & Key Vol. 2 — Jogo de Cabeça',        author:'Joe Hill', badge:'must',   badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Locke & Key Vol. 3 — Coroa de Sombras',      author:'Joe Hill', badge:'must',   badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Locke & Key Vol. 4 — Chaves do Reino',       author:'Joe Hill', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Locke & Key Vol. 5 — Escuridão e Luz',       author:'Joe Hill', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Locke & Key Vol. 6 — Alpha & Omega',         author:'Joe Hill', badge:'legend', badgeLabel:'Lendário',    volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'saga', group:'indie', name:'🚀 Saga', color:'#f4a261', arcs:[
+    { name:'Saga Vol. 1',  author:'Brian K. Vaughan', badge:'must',  badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 2',  author:'Brian K. Vaughan', badge:'must',  badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 3',  author:'Brian K. Vaughan', badge:'must',  badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 4',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 5',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 6',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 7',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 8',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 9',  author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+    { name:'Saga Vol. 10', author:'Brian K. Vaughan', badge:'great', badgeLabel:'Excelente',   volumes:[ ...vols('Issue',6) ] },
+  ]},
+  { id:'ylastman', group:'indie', name:'👨 Y: The Last Man', color:'#4cc9f0', arcs:[
+    { name:'Y Vol. 1 — Unmanned',            author:'Brian K. Vaughan', badge:'must',   badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 2 — Cycles',              author:'Brian K. Vaughan', badge:'must',   badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 3 — One Small Step',      author:'Brian K. Vaughan', badge:'must',   badgeLabel:'Obrigatório', volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 4 — Safeword',            author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 5 — Ring of Truth',       author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 6 — Girl on Girl',        author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 7 — Paper Dolls',         author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 8 — Kimono Dragons',      author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 9 — Motherland',          author:'Brian K. Vaughan', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:'Y Vol. 10 — Whys and Wherefores',author:'Brian K. Vaughan', badge:'legend', badgeLabel:'Lendário',    volumes:[ ...vols('Issue',5) ] },
+  ]},
+  { id:'maus',       group:'indie', name:'🐭 Maus',       color:'#a7a4c0', arcs:[
+    { name:'Maus I — O Meu Pai Sangra História',                       author:'Art Spiegelman', badge:'legend', badgeLabel:'Lendário', volumes:[ {label:'Livro Completo',read:false} ] },
+    { name:'Maus II — E Foi Aqui Que Começaram os Meus Problemas',    author:'Art Spiegelman', badge:'legend', badgeLabel:'Lendário', volumes:[ {label:'Livro Completo',read:false} ] },
+  ]},
+  { id:'persepolis', group:'indie', name:'🧕 Persépolis',  color:'#f9c74f', arcs:[
+    { name:'Persépolis', author:'Marjane Satrapi', badge:'legend', badgeLabel:'Lendário', volumes:[ {label:'Vol 1',read:false},{label:'Vol 2',read:false} ] },
+  ]},
+  { id:'fromhell',   group:'indie', name:'🎩 From Hell',   color:'#e63946', arcs:[
+    { name:'From Hell', author:'Alan Moore', badge:'legend', badgeLabel:'Lendário', volumes:[ ...vols('Capítulo',14) ] },
+  ]},
+  { id:'100bullets', group:'indie', name:'🔫 100 Bullets', color:'#f4d35e', arcs:[
+    { name:'100 Bullets', author:'Brian Azzarello', badge:'great', badgeLabel:'Excelente', volumes:[ ...vols('Vol',13) ] },
+  ]},
+  { id:'preacher', group:'indie', name:'✝️ Preacher', color:'#80b918', arcs:[
+    { name:"Preacher Vol. 1 — Gone to Texas",              author:'Garth Ennis', badge:'must',   badgeLabel:'Começa Aqui', volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 2 — Until the End of the World", author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 3 — Proud Americans",            author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 4 — Ancient History",            author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',5) ] },
+    { name:"Preacher Vol. 5 — Dixie Fried",                author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 6 — War in the Sun",             author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 7 — Salvation",                  author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',8) ] },
+    { name:"Preacher Vol. 8 — All Hell's a-Coming",        author:'Garth Ennis', badge:'great',  badgeLabel:'Excelente',   volumes:[ ...vols('Issue',7) ] },
+    { name:"Preacher Vol. 9 — Alamo",                      author:'Garth Ennis', badge:'legend', badgeLabel:'Lendário',    volumes:[ ...vols('Issue',7) ] },
+  ]},
+];
+
+// ─── ORDER LISTS ────────────────────────────────────────────────────────────
+// Each entry: { hid, ai, tip }  (hero id + arc index + optional tip)
+const ORDER_BY_CHAR = [
+  // DEMOLIDOR — continua a run do Zdarsky
+  { hid:'daredevil', ai:0, tip:'Já leste! A base de tudo o que se segue.' },
+  { hid:'daredevil', ai:1, tip:'Continua directamente do Homem Sem Medo. 36 issues — vai devagar.' },
+  { hid:'daredevil', ai:2, tip:'O grande finale da era Zdarsky. Vai buscar o Vol 5/6!' },
+  { hid:'daredevil', ai:3, tip:'Depois do Zdarsky, entra no Demolidor pelo Kevin Smith.' },
+  { hid:'daredevil', ai:4, tip:'Emotivo, sobre Karen Page. Mesmo estilo do Spider-Man: Blue.' },
+  { hid:'daredevil', ai:5, tip:'O clássico absoluto. Impacto máximo depois de conheceres bem o Matt.' },
+  { hid:'daredevil', ai:6, tip:'Tom completamente diferente — mais leve, mais colorido. Bom palato cleanser.' },
+  // HOMEM-ARANHA
+  { hid:'spiderman', ai:0, tip:'Já leste! A origem do Peter Parker.' },
+  { hid:'spiderman', ai:1, tip:'Coleção com os títulos reais — vê o * para saber o que está em cada tomo.' },
+  { hid:'spiderman', ai:2, tip:'Curto e emotivo. Lê entre volumes maiores da Salvat.' },
+  { hid:'spiderman', ai:3, tip:'Origem reimaginada. Diferente de tudo — boa mudança de ritmo.' },
+  // JUSTICEIRO
+  { hid:'punisher', ai:0, tip:'Melhor ponto de entrada. Garth Ennis no seu melhor humor negro.' },
+  { hid:'punisher', ai:1, tip:'Crossover perfeito se já leste o Demolidor do Zdarsky.' },
+  { hid:'punisher', ai:2, tip:'Mais sombrio e adulto. Só depois do Welcome Back.' },
+  // JESSICA JONES
+  { hid:'jessica', ai:0, tip:'Noir puro. Lê antes de qualquer outra coisa da Jessica.' },
+  { hid:'jessica', ai:1, tip:'Continuação directa — mais leve mas boa.' },
+  // CAP. AMÉRICA
+  { hid:'cap', ai:0, tip:'Espionagem, drama, morte. O Brubaker fez pelo Cap o que o Zdarsky fez pelo DD.' },
+  { hid:'cap', ai:1, tip:'Liga directamente ao crossover Civil War da Marvel.' },
+  { hid:'cap', ai:2, tip:'Finale épico da trilogia do Brubaker.' },
+  // BATMAN
+  { hid:'batman', ai:0, tip:'4 issues. Curto e perfeito. A melhor origem do Batman.' },
+  { hid:'batman', ai:1, tip:'Mistério noir viciante. Uma das melhores HQs alguma vez feitas.' },
+  { hid:'batman', ai:2, tip:'One-shot. Uma tarde de leitura. Perturbador e brilhante.' },
+  // SUPERMAN
+  { hid:'superman', ai:0, tip:'O melhor Superman de sempre. Épico e emotivo.' },
+  { hid:'superman', ai:2, tip:'Só 2 issues. A despedida perfeita ao Superman clássico.' },
+  // FLASH
+  { hid:'flash', ai:0, tip:'5 issues. A melhor origem do Flash.' },
+  { hid:'flash', ai:1, tip:'Um dos melhores arcos dos anos 90. Surpreendente.' },
+  // X-MEN
+  { hid:'xmen', ai:0, tip:'One-shot. O melhor ponto de entrada nos X-Men.' },
+  { hid:'xmen', ai:1, tip:'Só 2 issues mas impacto enorme.' },
+  { hid:'xmen', ai:3, tip:'O melhor arco X-Men moderno. Cinematográfico.' },
+  { hid:'xmen', ai:2, tip:'Mais experimental. Deixa para depois do Whedon.' },
+  // VINGADORES
+  { hid:'avengers', ai:0, tip:'Os filmes da Marvel foram baseados nisto.' },
+  { hid:'avengers', ai:1, tip:'O melhor arco do Ultron.' },
+  // ABSOLUTE DC
+  { hid:'abs-ww', ai:0, tip:'O melhor da linha Absolute. Começa aqui.' },
+  { hid:'abs-batman', ai:0, tip:'O que arrancou toda a linha.' },
+  { hid:'abs-mm', ai:0, tip:'A maior surpresa de 2025. Surrealista e profundo.' },
+  { hid:'abs-superman', ai:0, tip:'Muito bem recebido. Lê depois do Batman.' },
+  // LIGA DA JUSTIÇA
+  { hid:'jla', ai:0, tip:'O melhor ponto de entrada para a Liga.' },
+  { hid:'jla', ai:1, tip:'E se o Batman tivesse planos contra cada membro? Brilhante.' },
+  { hid:'jla', ai:2, tip:'Arte pintada deslumbrante. Lê quando tiveres experiência DC.' },
+  // INDEPENDENTES
+  { hid:'lockekey', ai:0, tip:'O ponto de entrada mais acessível dos independentes. Vicia.' },
+  { hid:'lockekey', ai:1 },{ hid:'lockekey', ai:2 },{ hid:'lockekey', ai:3 },{ hid:'lockekey', ai:4 },{ hid:'lockekey', ai:5 },
+  { hid:'maus', ai:0, tip:'2 livros. Um dos maiores feitos da literatura gráfica.' },
+  { hid:'maus', ai:1 },
+  { hid:'sandman', ai:0, tip:'Não saltes issues — o Gaiman constrói tudo em camadas.' },
+  { hid:'sandman', ai:1 },{ hid:'sandman', ai:2 },{ hid:'sandman', ai:3 },{ hid:'sandman', ai:4 },
+  { hid:'sandman', ai:5 },{ hid:'sandman', ai:6 },{ hid:'sandman', ai:7 },{ hid:'sandman', ai:8 },{ hid:'sandman', ai:9 },
+  { hid:'ylastman', ai:0, tip:'Um dos melhores finais de sempre. Não lias o último sem ter lenços.' },
+  { hid:'ylastman', ai:1 },{ hid:'ylastman', ai:2 },{ hid:'ylastman', ai:3 },{ hid:'ylastman', ai:4 },
+  { hid:'ylastman', ai:5 },{ hid:'ylastman', ai:6 },{ hid:'ylastman', ai:7 },{ hid:'ylastman', ai:8 },{ hid:'ylastman', ai:9 },
+  { hid:'saga', ai:0, tip:'Ficção científica + drama familiar. Viciante desde a pág. 1.' },
+  { hid:'saga', ai:1 },{ hid:'saga', ai:2 },{ hid:'saga', ai:3 },{ hid:'saga', ai:4 },
+  { hid:'saga', ai:5 },{ hid:'saga', ai:6 },{ hid:'saga', ai:7 },{ hid:'saga', ai:8 },{ hid:'saga', ai:9 },
+  { hid:'watchmen', ai:0, tip:'Lê isto depois de teres umas 15-20 HQs feitas. Vai mudar tudo.' },
+  { hid:'persepolis', ai:0, tip:'Muito curto. Uma tarde de leitura. Absolutamente brilhante.' },
+  { hid:'fromhell', ai:0, tip:'Denso e lento. Reserva para quando tiveres paciência literária.' },
+  { hid:'100bullets', ai:0, tip:'Noir puro. 13 volumes — bom para intercalar com super-heróis.' },
+  { hid:'preacher', ai:0, tip:'Não é para toda a gente — deliberadamente chocante. Mas inesquecível.' },
+  { hid:'preacher', ai:1 },{ hid:'preacher', ai:2 },{ hid:'preacher', ai:3 },{ hid:'preacher', ai:4 },
+  { hid:'preacher', ai:5 },{ hid:'preacher', ai:6 },{ hid:'preacher', ai:7 },{ hid:'preacher', ai:8 },
+  { hid:'invincible', ai:0, tip:'25 volumes mas completamente fechado. Uma das melhores histórias de super-heróis.' },
+];
+
+// MIXED ORDER — entrelaçado para não aborrecer
+const ORDER_MIXED = [
+  { hid:'daredevil', ai:1, tip:'Continua o Zdarsky. A tua próxima leitura natural.' },
+  { hid:'batman', ai:0, tip:'4 issues só. Pausa rápida entre runs longas.' },
+  { hid:'daredevil', ai:2, tip:'O finale do Zdarsky. Vai buscar o Vol 5/6!' },
+  { hid:'lockekey', ai:0, tip:'Primeira pausa nos independentes. Vicia imenso.' },
+  { hid:'punisher', ai:0, tip:'Humor negro, acção. Mudança de ritmo total.' },
+  { hid:'batman', ai:1, tip:'The Long Halloween — mistério noir. Viciante.' },
+  { hid:'jessica', ai:0, tip:'Alias — noir, maduro. Relaciona-se com o DD que já leste.' },
+  { hid:'spiderman', ai:2, tip:'Spider-Man: Blue — curto e emotivo. Bom descanso.' },
+  { hid:'cap', ai:0, tip:'Winter Soldier — espionagem épica. O Brubaker a brilhar.' },
+  { hid:'lockekey', ai:1 },
+  { hid:'daredevil', ai:3, tip:'Guardian Devil — entra no DD clássico agora.' },
+  { hid:'flash', ai:0, tip:'Born to Run — 5 issues. Origem do Flash em nada de tempo.' },
+  { hid:'cap', ai:1, tip:'Civil War do Brubaker.' },
+  { hid:'abs-ww', ai:0, tip:'Absolute Wonder Woman — o melhor da linha. Moderninho e fresco.' },
+  { hid:'daredevil', ai:4, tip:'Demolidor Amarelo — emotivo, mesmo estilo do Spider-Man: Blue.' },
+  { hid:'xmen', ai:0, tip:'God Loves, Man Kills — one-shot. Os X-Men em 1 tarde.' },
+  { hid:'sandman', ai:0, tip:'Começa o Sandman. Não saltes issues.' },
+  { hid:'abs-batman', ai:0, tip:'Absolute Batman — o que arrancou a linha.' },
+  { hid:'cap', ai:2, tip:'Death of Captain America — finale épico da trilogia.' },
+  { hid:'lockekey', ai:2 },
+  { hid:'daredevil', ai:5, tip:'Born Again — agora sim. Com todo o contexto, o impacto é máximo.' },
+  { hid:'sandman', ai:1 },
+  { hid:'avengers', ai:0, tip:'The Ultimates — os Vingadores que inspiraram os filmes.' },
+  { hid:'abs-mm', ai:0, tip:'Absolute Martian Manhunter — a maior surpresa de 2025.' },
+  { hid:'superman', ai:0, tip:'All-Star Superman — o melhor Superman de sempre.' },
+  { hid:'sandman', ai:2 },
+  { hid:'xmen', ai:3, tip:'Astonishing X-Men — o melhor arco moderno dos X-Men.' },
+  { hid:'ylastman', ai:0, tip:'Y: The Last Man — um dos melhores finais de sempre.' },
+  { hid:'lockekey', ai:3 },
+  { hid:'sandman', ai:3 },
+  { hid:'punisher', ai:1, tip:'DD vs Justiceiro — crossover perfeito.' },
+  { hid:'jla', ai:0, tip:'JLA New World Order — o melhor ponto de entrada para a Liga.' },
+  { hid:'ylastman', ai:1 },{ hid:'ylastman', ai:2 },
+  { hid:'sandman', ai:4 },{ hid:'sandman', ai:5 },
+  { hid:'saga', ai:0, tip:'Saga — ficção científica + drama. Entra quando quiseres.' },
+  { hid:'lockekey', ai:4 },{ hid:'lockekey', ai:5 },
+  { hid:'maus', ai:0, tip:'Maus — 2 livros. Um dos maiores da literatura gráfica.' },{ hid:'maus', ai:1 },
+  { hid:'sandman', ai:6 },{ hid:'sandman', ai:7 },{ hid:'sandman', ai:8 },{ hid:'sandman', ai:9 },
+  { hid:'saga', ai:1 },{ hid:'saga', ai:2 },{ hid:'saga', ai:3 },{ hid:'saga', ai:4 },
+  { hid:'ylastman', ai:3 },{ hid:'ylastman', ai:4 },{ hid:'ylastman', ai:5 },
+  { hid:'watchmen', ai:0, tip:'Agora sim — depois de todo este percurso, o Watchmen vai fazer sentido total.' },
+  { hid:'preacher', ai:0, tip:'Preacher — não é para toda a gente mas é inesquecível.' },
+  { hid:'invincible', ai:0, tip:'25 volumes mas completamente fechado. Uma jornada épica.' },
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let stored = JSON.parse(localStorage.getItem('rl4') || '{}');
+HEROES.forEach(h => h.arcs.forEach((a,ai) => a.volumes.forEach((v,vi) => {
+  const k = `${h.id}.${ai}.${vi}`;
+  if (v.read && stored[k] === undefined) stored[k] = true;
+})));
+save();
+
+function save() { localStorage.setItem('rl4', JSON.stringify(stored)); }
+function isRead(hid,ai,vi) { return !!stored[`${hid}.${ai}.${vi}`]; }
+function toggle(hid,ai,vi) { const k=`${hid}.${ai}.${vi}`; stored[k]=!stored[k]; save(); render(); }
+function arcDone(hid,ai) { return HEROES.find(h=>h.id===hid).arcs[ai].volumes.every((_,vi)=>isRead(hid,ai,vi)); }
+function arcProgress(hid,ai) {
+  const arc = HEROES.find(h=>h.id===hid).arcs[ai];
+  const total = arc.volumes.length;
+  const done = arc.volumes.filter((_,vi)=>isRead(hid,ai,vi)).length;
+  return {done,total};
+}
+
+let activeView = 'library';
+let activeGroup = 'all';
+let openArcs = {};
+
+function setView(v, btn) {
+  activeView = v;
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabs-wrap').style.display = (v==='library') ? '' : 'none';
+  render();
+}
+function setGroup(id) { activeGroup=id; render(); }
+
+function renderTabs() {
+  const el = document.getElementById('tabs');
+  let h = `<button class="tab ${activeGroup==='all'?'active':''}" style="--tab-c:var(--yellow)" onclick="setGroup('all')">Todos</button>`;
+  GROUPS.forEach(g => {
+    h += `<button class="tab ${activeGroup===g.id?'active':''}" style="--tab-c:${g.color}" onclick="setGroup('${g.id}')">${g.label}</button>`;
+  });
+  el.innerHTML = h;
+}
+
+function updateStats() {
+  let totVols=0, totDone=0, totArcs=0, doneArcs=0;
+  HEROES.forEach(h => h.arcs.forEach((a,ai) => {
+    totArcs++;
+    a.volumes.forEach((_,vi) => { totVols++; if(isRead(h.id,ai,vi)) totDone++; });
+    if(arcDone(h.id,ai)) doneArcs++;
+  }));
+  const pct = totVols>0 ? Math.round(totDone/totVols*100) : 0;
+  document.getElementById('s-total-arcs').textContent = totArcs;
+  document.getElementById('s-total-vols').textContent = totVols+' volumes';
+  document.getElementById('s-done-arcs').textContent = doneArcs;
+  document.getElementById('s-done-vols').textContent = totDone+' volumes';
+  document.getElementById('s-left-arcs').textContent = totArcs-doneArcs;
+  document.getElementById('s-left-vols').textContent = (totVols-totDone)+' volumes';
+  document.getElementById('s-pct2').textContent = pct+'%';
+  document.getElementById('s-pct').textContent = pct+'%';
+  document.getElementById('s-bar').style.width = pct+'%';
+}
+
+function renderArc(h, arc, ai) {
+  const {done,total} = arcProgress(h.id,ai);
+  const pct = total>0 ? Math.round(done/total*100) : 0;
+  const isDone = done===total;
+  const arcKey = `${h.id}.${ai}`;
+  const isOpen = !!openArcs[arcKey];
+  let html = `<div class="arc ${isDone?'arc-done':''} ${isOpen?'open':''}" style="--arc-c:${h.color}" id="arc-${arcKey}">
+    <div class="arc-header" onclick="toggleArc('${arcKey}')">
+      <div class="arc-dot"></div>
+      <div>
+        <div class="arc-name">${arc.name} ${isDone?'<span style="color:var(--green);font-size:0.8rem">✓</span>':''}</div>
+        <div class="arc-meta">${arc.author}</div>
+      </div>
+      <span class="badge badge-${arc.badge}" style="margin-left:auto;margin-right:8px">${arc.badgeLabel}</span>
+      <span class="arc-prog-text">${done}/${total}</span>
+      <span class="arc-chevron">▶</span>
+    </div>
+    <div style="height:3px;background:var(--border)"><div style="height:100%;width:${pct}%;background:${h.color};transition:width 0.4s"></div></div>
+    <div class="vols-grid">`;
+  arc.volumes.forEach((v,vi) => {
+    const rd = isRead(h.id,ai,vi);
+    html += `<div class="vol-item ${rd?'done':''}" onclick="toggle('${h.id}',${ai},${vi})">
+      <div class="vol-check">${rd?'✓':'○'}</div>
+      <div class="vol-label">${v.label}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+function render() {
+  updateStats();
+  renderTabs();
+  const app = document.getElementById('app');
+
+  if (activeView === 'library') {
+    const heroes = activeGroup==='all' ? HEROES : HEROES.filter(h=>h.group===activeGroup);
+    let html = '';
+    heroes.forEach(h => {
+      const totalV = h.arcs.reduce((s,a)=>s+a.volumes.length,0);
+      const doneV  = h.arcs.reduce((s,a,ai)=>s+a.volumes.filter((_,vi)=>isRead(h.id,ai,vi)).length,0);
+      const totalA = h.arcs.length;
+      const doneA  = h.arcs.filter((_,ai)=>arcDone(h.id,ai)).length;
+      const heroPct = totalV>0 ? Math.round(doneV/totalV*100) : 0;
+      html += `<div class="hero-block">
+        <div class="hero-title" style="color:${h.color}">
+          ${h.name}
+          <span class="hero-prog">${totalA} livros (${totalV} vol) · ${doneA} lidos (${doneV} vol) · ${heroPct}%</span>
+        </div>`;
+      h.arcs.forEach((arc,ai) => {
+        if (arc.salvatNote) html += `<div class="salvat-note">ℹ️ ${arc.salvatNote}</div>`;
+        html += renderArc(h, arc, ai);
+      });
+      html += `</div>`;
+    });
+    app.innerHTML = html || '<p style="text-align:center;color:var(--muted);padding:40px">Nada aqui!</p>';
+    return;
+  }
+
+  // ORDER or MIXED view
+  const list = activeView==='order' ? ORDER_BY_CHAR : ORDER_MIXED;
+  let html = `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(249,199,79,0.06);border:1px solid rgba(249,199,79,0.2);border-radius:10px;font-size:0.82rem;color:var(--muted)">
+    ${activeView==='order'
+      ? '🎯 <strong style="color:var(--yellow)">Ordem por personagem</strong> — terminas cada herói antes de passar ao seguinte. Clica em qualquer linha para expandir os volumes.'
+      : '🔀 <strong style="color:var(--yellow)">Ordem misturada</strong> — alternância recomendada entre personagens para não te aborreces. A melhor forma de ler tudo.'
+    }
+  </div>`;
+
+  list.forEach((entry, idx) => {
+    const h = HEROES.find(x=>x.id===entry.hid);
+    if (!h) return;
+    const arc = h.arcs[entry.ai];
+    if (!arc) return;
+    const {done,total} = arcProgress(h.id,entry.ai);
+    const isDone = done===total;
+    const arcKey = `${h.id}.${entry.ai}`;
+    const isOpen = !!openArcs[`order-${arcKey}`];
+
+    if (activeView==='order') {
+      html += `<div class="order-step ${isDone?'done':''}">
+        <div class="order-step-num">${idx+1}</div>
+        <div class="order-step-body" onclick="toggleOrderArc('order-${arcKey}')">
+          <div class="order-step-hero" style="color:${h.color}">${h.name}</div>
+          <div class="order-step-name">${arc.name}</div>
+          <div class="order-step-author">${arc.author}</div>
+          ${entry.tip ? `<div class="order-step-tip">💡 ${entry.tip}</div>` : ''}
+        </div>
+        <div class="order-step-right">
+          <span class="badge badge-${arc.badge}">${arc.badgeLabel}</span>
+          <span style="font-size:0.75rem;color:var(--muted)">${done}/${total}</span>
+        </div>
+      </div>
+      ${isOpen ? `<div style="margin:-8px 0 12px;padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:0 0 10px 10px"><div class="vols-grid" style="display:grid">${arc.volumes.map((v,vi)=>{const rd=isRead(h.id,entry.ai,vi);return`<div class="vol-item ${rd?'done':''}" onclick="toggle('${h.id}',${entry.ai},${vi})" style="--arc-c:${h.color}"><div class="vol-check">${rd?'✓':'○'}</div><div class="vol-label">${v.label}</div></div>`;}).join('')}</div></div>` : ''}`;
+    } else {
+      html += `<div class="mixed-step ${isDone?'done':''}" style="--step-c:${h.color}">
+        <div class="mixed-header" onclick="toggleOrderArc('order-${arcKey}')">
+          <div class="mixed-num">${idx+1}</div>
+          <div class="mixed-hero-tag">${h.name}</div>
+          <div class="mixed-name">${arc.name}</div>
+          <div class="mixed-check" onclick="event.stopPropagation()">${isDone?'✓':'○'}</div>
+        </div>
+        ${entry.tip ? `<div style="padding:0 14px 10px;font-size:0.78rem;color:#c8c5d8">💡 ${entry.tip}</div>` : ''}
+        ${isOpen ? `<div style="padding:0 14px 12px"><div class="vols-grid" style="display:grid">${arc.volumes.map((v,vi)=>{const rd=isRead(h.id,entry.ai,vi);return`<div class="vol-item ${rd?'done':''}" onclick="toggle('${h.id}',${entry.ai},${vi})" style="--arc-c:${h.color}"><div class="vol-check">${rd?'✓':'○'}</div><div class="vol-label">${v.label}</div></div>`;}).join('')}</div></div>` : ''}
+      </div>`;
+    }
+  });
+
+  app.innerHTML = html;
+}
+
+function toggleArc(key) { openArcs[key]=!openArcs[key]; render(); }
+function toggleOrderArc(key) { openArcs[key]=!openArcs[key]; render(); }
+
+render();
+</script>
+</body>
+</html>
